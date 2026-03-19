@@ -1,0 +1,221 @@
+---
+import Link from '@/components/shared/Link.astro'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  getParentId,
+  getPostsGroupedByCategoryAndYear,
+  getSubpostsForParent,
+  isSubpost,
+} from '@/lib/data-utils'
+import { Icon } from 'astro-icon/components'
+import type { CollectionEntry } from 'astro:content'
+
+const { currentPostId = '' } = Astro.props
+
+const groups = await getPostsGroupedByCategoryAndYear()
+
+const categoryLabels: Record<string, string> = {
+  ctf: 'CTF',
+  education: 'EDUCATION',
+  tools: 'Tools',
+  general: 'General',
+}
+
+const categoryIcons: Record<string, string> = {
+  ctf: 'lucide:flag',
+  education: 'lucide:graduation-cap',
+  tools: 'lucide:wrench',
+  general: 'lucide:book-open',
+}
+
+function getPostIcon(post: CollectionEntry<'blog'>) {
+  if (isSubpost(post.id)) return 'lucide:file-text'
+  return 'lucide:book-open-text'
+}
+---
+
+<aside
+  id='blog-sidebar-container'
+  class='border-border bg-background/50 sticky top-20 hidden h-[calc(100vh-5rem)] w-52 shrink-0 overflow-hidden border-r lg:block'
+>
+  <ScrollArea client:load className='flex h-full flex-col overflow-y-auto' data-blog-sidebar-scroll>
+    <nav class='flex flex-col gap-1 px-3 py-4' aria-label='Blog navigation'>
+      <div class='mb-4 px-2'>
+        <span class='text-muted-foreground text-xs font-medium'># whoami</span>
+      </div>
+
+      {
+        groups.map(({ category, years }) => {
+          const yearKeys = Object.keys(years).sort((a, b) => parseInt(b) - parseInt(a))
+          const defaultOpenYear = yearKeys.find((year) =>
+            years[year].some(
+              (p) =>
+                p.id === currentPostId ||
+                (isSubpost(currentPostId) && getParentId(currentPostId) === p.id),
+            ),
+          )
+
+          return (
+            <div class='mb-2'>
+              <div class='text-foreground mb-1 flex items-center gap-2 px-2 font-semibold'>
+                <Icon name={categoryIcons[category] ?? 'lucide:folder'} class='size-4' />
+                {categoryLabels[category] ?? category}
+              </div>
+
+              {yearKeys.map((year) => {
+                const posts = years[year]
+                const isCurrentYear = defaultOpenYear === year
+                const hasCurrentPostInYear = posts.some(
+                  (p) =>
+                    p.id === currentPostId ||
+                    (isSubpost(currentPostId) && getParentId(currentPostId) === p.id),
+                )
+
+                return (
+                  <details class='group/year' open={isCurrentYear || hasCurrentPostInYear}>
+                    <summary class='hover:bg-muted/50 flex cursor-pointer list-none items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors [&::-webkit-details-marker]:hidden'>
+                      <Icon name='lucide:calendar' class='text-muted-foreground size-3.5' />
+                      <span class='text-muted-foreground flex-1 font-medium'>{year}</span>
+                      <Icon
+                        name='lucide:chevron-down'
+                        class='text-muted-foreground size-3.5 transition-transform group-open/year:rotate-180'
+                      />
+                    </summary>
+                    <ul class='border-border mt-1 ml-2 space-y-0.5 border-l pl-3'>
+                      {posts
+                        .filter((p) => !isSubpost(p.id))
+                        .map(async (post) => {
+                          const subposts = await getSubpostsForParent(post.id)
+                          const isActive =
+                            post.id === currentPostId ||
+                            (isSubpost(currentPostId) && getParentId(currentPostId) === post.id)
+
+                          return (
+                            <li class='space-y-0.5'>
+                              {isActive ? (
+                                <div class='bg-muted text-foreground blog-sidebar-active flex min-w-0 items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium'>
+                                  <Icon name={getPostIcon(post)} class='size-3.5 shrink-0' />
+                                  <span class='min-w-0 text-pretty wrap-break-word'>
+                                    {post.data.title}
+                                  </span>
+                                </div>
+                              ) : (
+                                <Link
+                                  href={`/blog/${post.id}`}
+                                  class='hover:bg-muted/50 text-muted-foreground hover:text-foreground blog-sidebar-link flex min-w-0 items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors'
+                                >
+                                  <Icon name={getPostIcon(post)} class='size-3.5 shrink-0' />
+                                  <span class='min-w-0 text-pretty wrap-break-word'>
+                                    {post.data.title}
+                                  </span>
+                                  {subposts.length > 0 && (
+                                    <Icon name='lucide:chevron-right' class='ml-auto size-3' />
+                                  )}
+                                </Link>
+                              )}
+
+                              {subposts.length > 0 && (
+                                <ul class='ml-3 space-y-0.5'>
+                                  {subposts.map((subpost) => {
+                                    const isSubActive = subpost.id === currentPostId
+                                    return isSubActive ? (
+                                      <li>
+                                        <div class='bg-muted text-foreground blog-sidebar-active flex min-w-0 items-center gap-2 rounded-md px-2 py-1 text-xs font-medium'>
+                                          <Icon name='lucide:file-text' class='size-3 shrink-0' />
+                                          <span class='min-w-0 text-pretty wrap-break-word'>
+                                            {subpost.data.title}
+                                          </span>
+                                        </div>
+                                      </li>
+                                    ) : (
+                                      <li>
+                                        <Link
+                                          href={`/blog/${subpost.id}`}
+                                          class='hover:bg-muted/50 text-muted-foreground hover:text-foreground blog-sidebar-link flex min-w-0 items-center gap-2 rounded-md px-2 py-1 text-xs transition-colors'
+                                        >
+                                          <Icon name='lucide:file-text' class='size-3 shrink-0' />
+                                          <span class='min-w-0 text-pretty wrap-break-word'>
+                                            {subpost.data.title}
+                                          </span>
+                                        </Link>
+                                      </li>
+                                    )
+                                  })}
+                                </ul>
+                              )}
+                            </li>
+                          )
+                        })}
+                    </ul>
+                  </details>
+                )
+              })}
+            </div>
+          )
+        })
+      }
+    </nav>
+  </ScrollArea>
+</aside>
+
+<script>
+  const state = {
+    scrollArea: null as HTMLElement | null,
+    sidebarScroll: null as HTMLElement | null,
+  }
+
+  function updateScrollMask() {
+    if (!state.scrollArea || !state.sidebarScroll) return
+    const { scrollTop, scrollHeight, clientHeight } = state.scrollArea
+    const threshold = 5
+    const isAtTop = scrollTop <= threshold
+    const isAtBottom = scrollTop >= scrollHeight - clientHeight - threshold
+    state.sidebarScroll.classList.toggle('mask-t-from-90%', !isAtTop)
+    state.sidebarScroll.classList.toggle('mask-b-from-90%', !isAtBottom)
+  }
+
+  function scrollToActive() {
+    if (!state.scrollArea) return
+    const active = state.scrollArea.querySelector('.blog-sidebar-active')
+    if (!active) return
+    const { top: areaTop, height: areaHeight } = state.scrollArea.getBoundingClientRect()
+    const { top: itemTop, height: itemHeight } = active.getBoundingClientRect()
+    const currentTop = itemTop - areaTop + state.scrollArea.scrollTop
+    const target = Math.max(
+      0,
+      Math.min(
+        currentTop - (areaHeight - itemHeight) / 2,
+        state.scrollArea.scrollHeight - state.scrollArea.clientHeight,
+      ),
+    )
+    state.scrollArea.scrollTop = target
+  }
+
+  function init() {
+    const container = document.getElementById('blog-sidebar-container')
+    if (!container) return
+    state.scrollArea =
+      container.querySelector('[data-radix-scroll-area-viewport]') ||
+      container.querySelector('[data-slot="scroll-area-viewport"]')
+    state.sidebarScroll = container.querySelector(
+      '[data-blog-sidebar-scroll]',
+    ) as HTMLElement | null
+    if (state.scrollArea) {
+      state.scrollArea.addEventListener('scroll', updateScrollMask, {
+        passive: true,
+      })
+    }
+    requestAnimationFrame(() => {
+      scrollToActive()
+      setTimeout(updateScrollMask, 100)
+    })
+  }
+
+  document.addEventListener('astro:page-load', init)
+  document.addEventListener('astro:after-swap', () => {
+    state.scrollArea?.removeEventListener('scroll', updateScrollMask)
+    state.scrollArea = null
+    state.sidebarScroll = null
+    init()
+  })
+</script>

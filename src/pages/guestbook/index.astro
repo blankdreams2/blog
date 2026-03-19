@@ -1,0 +1,34 @@
+---
+import Breadcrumbs from '@/components/shared/Breadcrumbs.astro'
+import Guestbook from '@/components/guestbook/Guestbook.astro'
+import { SpinMail } from '@/components/spin/SpinMail'
+import PageTitle from '@/components/home/PageTitle.astro'
+import PageHead from '@/components/shared/PageHead.astro'
+import Layout from '@/layouts/Layout.astro'
+import { supabase } from '@/lib/supabase'
+
+/* The only page where it is ok to not prerender due to user interaction -- aka render on demmand*/
+export const prerender = false
+
+const { data: messages } = await supabase
+  .from('guestbook')
+  .select('id, message, created_at, name, email')
+  .order('created_at', { ascending: false })
+  .limit(100)
+
+const error = Astro.url.searchParams.get('error')
+---
+
+<Layout class='max-w-2xl'>
+  <PageHead slot='head' title='Guestbook' />
+  <PageTitle titleJP='弱いも'>
+    <Breadcrumbs slot='breadcrumbs' items={[{ label: 'Guestbook', icon: 'lucide:book-open' }]} />
+  </PageTitle>
+  <Guestbook
+    messages={messages ?? []}
+    error={error}
+    supabaseUrl={import.meta.env.SUPABASE_URL}
+    supabaseKey={import.meta.env.SUPABASE_ANON_KEY}
+  />
+  <SpinMail client:idle />
+</Layout>

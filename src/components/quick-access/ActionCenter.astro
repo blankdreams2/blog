@@ -1,0 +1,198 @@
+---
+import { ActionCenterThemeCard } from './ActionCenterThemeCard'
+---
+
+<div class='flex flex-col gap-2'>
+  <h3 class='text-muted-foreground px-2 text-xs font-semibold tracking-wider uppercase'>
+    Action Center
+  </h3>
+
+  <div class='flex flex-1 flex-col gap-8 p-2'>
+    <div class='flex h-24 gap-4'>
+      <!-- Theme Toggle (AnimatedThemeToggler) -->
+      <ActionCenterThemeCard client:load />
+
+      <!-- Focus Toggle -->
+      <button
+        type='button'
+        id='action-focus'
+        class='action-center-focus relative flex flex-1 flex-col justify-between overflow-hidden rounded-xl p-4 transition-colors bg-muted/30'
+      >
+        <div class='flex h-9 w-9 shrink-0 items-center justify-center'>
+          <span class='action-focus-off' aria-hidden>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='20'
+              height='20'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='2'
+            >
+              <path d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'></path>
+              <circle cx='12' cy='12' r='3'></circle>
+            </svg>
+          </span>
+          <span class='action-focus-on hidden' aria-hidden>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='20'
+              height='20'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='2'
+            >
+              <path d='M10.733 5a3 3 0 0 1 2.534 0'></path>
+              <path d='M17.252 4.03A10 10 0 0 0 4.03 17.25'></path>
+              <path d='M19.03 6.75a10 10 0 0 0-13.28 13.28'></path>
+              <path d='M14 12a2 2 0 0 1-2 2'></path>
+              <path d='M2 2l20 20'></path>
+            </svg>
+          </span>
+        </div>
+        <div class='text-left text-[13px] font-medium dark:font-normal'>
+          Focus: <span class='action-focus-label'>Off</span>
+        </div>
+      </button>
+    </div>
+
+    <div class='flex h-24 gap-4'>
+      <!-- Sound Toggle -->
+      <button
+        type='button'
+        id='action-sound'
+        class='action-center-sound relative flex flex-1 flex-col justify-between overflow-hidden rounded-xl p-4 transition-colors bg-muted/30'
+      >
+        <div class='flex h-9 w-9 shrink-0 items-center justify-center'>
+          <span class='action-sound-on' aria-hidden>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='20'
+              height='20'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='2'
+              stroke-linecap='round'
+              stroke-linejoin='round'
+            >
+              <path d='M11 5L6 9H2v6h4l5 4V5Z'></path>
+              <path d='M15.54 8.46a5 5 0 0 1 0 7.07'></path>
+              <path d='M19.07 4.93a10 10 0 0 1 0 14.14'></path>
+            </svg>
+          </span>
+          <span class='action-sound-off hidden' aria-hidden>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='20'
+              height='20'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='2'
+              stroke-linecap='round'
+              stroke-linejoin='round'
+            >
+              <path d='M11 5L6 9H2v6h4l5 4V5Z'></path>
+              <path d='M22 9l-6 6'></path>
+              <path d='M16 9l6 6'></path>
+            </svg>
+          </span>
+        </div>
+        <div class='text-left text-[13px] font-medium dark:font-normal'>
+          Sound: <span class='action-sound-label'>On</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  ;(function () {
+    function getFocus() {
+      return document.documentElement.classList.contains('focus-mode')
+    }
+
+    function getSoundEnabled() {
+      return !document.documentElement.classList.contains('sound-off')
+    }
+
+    function initSoundFromStorage() {
+      try {
+        const stored = localStorage.getItem('sound')
+        if (stored === 'off') document.documentElement.classList.add('sound-off')
+        if (stored === 'on') document.documentElement.classList.remove('sound-off')
+      } catch (_) {}
+    }
+
+    function updateFocusUI() {
+      const on = getFocus()
+      const btn = document.getElementById('action-focus')
+      const label = btn?.querySelector('.action-focus-label')
+      const iconOff = btn?.querySelector('.action-focus-off')
+      const iconOn = btn?.querySelector('.action-focus-on')
+
+      if (label) label.textContent = on ? 'On' : 'Off'
+      if (iconOff) iconOff.classList.toggle('hidden', on)
+      if (iconOn) iconOn.classList.toggle('hidden', !on)
+      if (btn) {
+        btn.classList.toggle('bg-muted', on)
+        btn.classList.toggle('bg-muted/30', !on)
+      }
+    }
+
+    function updateSoundUI() {
+      const on = getSoundEnabled()
+      const btn = document.getElementById('action-sound')
+      const label = btn?.querySelector('.action-sound-label')
+      const iconOn = btn?.querySelector('.action-sound-on')
+      const iconOff = btn?.querySelector('.action-sound-off')
+
+      if (label) label.textContent = on ? 'On' : 'Off'
+      if (iconOn) iconOn.classList.toggle('hidden', !on)
+      if (iconOff) iconOff.classList.toggle('hidden', on)
+      if (btn) {
+        btn.classList.toggle('bg-muted', on)
+        btn.classList.toggle('bg-muted/30', !on)
+      }
+    }
+
+    function setSoundEnabled(enabled) {
+      document.documentElement.classList.toggle('sound-off', !enabled)
+      try {
+        localStorage.setItem('sound', enabled ? 'on' : 'off')
+      } catch (_) {}
+      window.dispatchEvent(new CustomEvent('sound-mode-change'))
+    }
+
+    function init() {
+      const focusBtn = document.getElementById('action-focus')
+      const soundBtn = document.getElementById('action-sound')
+
+      initSoundFromStorage()
+
+      focusBtn?.addEventListener('click', () => {
+        document.documentElement.classList.toggle('focus-mode')
+        updateFocusUI()
+        window.dispatchEvent(new CustomEvent('focus-mode-change'))
+      })
+
+      soundBtn?.addEventListener('click', () => {
+        setSoundEnabled(!getSoundEnabled())
+        updateSoundUI()
+      })
+
+      window.addEventListener('focus-mode-change', updateFocusUI)
+      window.addEventListener('sound-mode-change', updateSoundUI)
+      updateFocusUI()
+      updateSoundUI()
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init)
+    } else {
+      init()
+    }
+  })()
+</script>

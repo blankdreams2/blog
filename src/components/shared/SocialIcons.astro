@@ -1,0 +1,36 @@
+---
+import Link from '@/components/shared/Link.astro'
+import { buttonVariants } from '@/components/ui/button'
+import { ICON_MAP } from '@/consts'
+import type { SocialLink } from '@/types'
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+  links: SocialLink[]
+  variant?: 'outline' | 'ghost'
+  iconClass?: string
+}
+
+const { links, variant = 'outline', iconClass = 'size-4' } = Astro.props
+---
+
+<ul class='flex flex-wrap justify-center gap-2' role='list'>
+  {
+    links.map(({ href, label }) => (
+      <li>
+        <Link
+          href={href}
+          aria-label={label}
+          title={label}
+          class={buttonVariants({ variant, size: 'icon' })}
+          external
+        >
+          <Icon
+            name={ICON_MAP[label as keyof typeof ICON_MAP] || 'lucide:message-circle-question'}
+            class={iconClass}
+          />
+        </Link>
+      </li>
+    ))
+  }
+</ul>

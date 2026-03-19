@@ -1,0 +1,136 @@
+---
+import { badgeVariants } from '@/components/ui/badge'
+import { Icon } from 'astro-icon/components'
+import type { CollectionEntry } from 'astro:content'
+
+interface Props {
+  posts: CollectionEntry<'blog'>[]
+}
+
+const { posts } = Astro.props
+
+// Get unique tags with counts from posts
+const tagCounts = new Map<string, number>()
+for (const post of posts) {
+  post.data.tags?.forEach((tag) => {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1)
+  })
+}
+const sortedTags = [...tagCounts.entries()]
+  .sort((a, b) => {
+    const countDiff = b[1] - a[1]
+    return countDiff !== 0 ? countDiff : a[0].localeCompare(b[0])
+  })
+  .map(([tag, count]) => ({ tag, count }))
+---
+
+<div class='mb-8' id='blog-tag-filter'>
+  <div class='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
+    Filter by tag
+  </div>
+  <div class='flex flex-wrap gap-2'>
+    <button
+      type='button'
+      class={badgeVariants({ variant: 'muted' })}
+      data-filter-tag='all'
+      data-active='true'
+    >
+      <Icon name='lucide:layout-grid' class='size-3' />
+      All
+    </button>
+    {
+      sortedTags.map(({ tag, count }) => (
+        <button
+          type='button'
+          class={badgeVariants({ variant: 'muted' })}
+          data-filter-tag={tag}
+          data-active='false'
+        >
+          <Icon name='lucide:hash' class='size-3' />
+          {tag}
+          <span class='text-muted-foreground/80'>({count})</span>
+        </button>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  #blog-tag-filter button {
+    transition: box-shadow 0.25s ease, background-color 0.25s ease;
+  }
+  #blog-tag-filter button[data-active='true'] {
+    box-shadow: 0 0 0 2px var(--color-primary);
+    background-color: var(--color-muted);
+  }
+</style>
+
+<style is:global>
+  /* View Transitions API: smooth filter cross-fade */
+  ::view-transition-old(blog-calendar-content),
+  ::view-transition-new(blog-calendar-content) {
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  ::view-transition-old(blog-calendar-content) {
+    animation-name: fade-out;
+  }
+  ::view-transition-new(blog-calendar-content) {
+    animation-name: fade-in;
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>
+
+<script>
+  function initTagFilter() {
+    const container = document.getElementById('blog-tag-filter')
+    if (!container) return
+
+    const buttons = container.querySelectorAll<HTMLButtonElement>('[data-filter-tag]')
+    const posts = document.querySelectorAll<HTMLElement>('[data-blog-post]')
+    const yearSections = document.querySelectorAll<HTMLElement>('[data-blog-year]')
+
+    function filterByTag(selectedTag: string) {
+      const update = () => {
+        buttons.forEach((btn) => {
+          const tag = btn.getAttribute('data-filter-tag')
+          btn.setAttribute('data-active', tag === selectedTag ? 'true' : 'false')
+        })
+
+        posts.forEach((post) => {
+          const tags = (post.getAttribute('data-tags') ?? '').split(',').map((t) => t.trim())
+          const show = selectedTag === 'all' || tags.includes(selectedTag)
+          post.hidden = !show
+        })
+
+        yearSections.forEach((section) => {
+          const visiblePosts = section.querySelectorAll<HTMLElement>('[data-blog-post]:not([hidden])')
+          section.hidden = visiblePosts.length === 0
+        })
+      }
+
+      if (typeof document.startViewTransition === 'function') {
+        document.startViewTransition(update)
+      } else {
+        update()
+      }
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tag = btn.getAttribute('data-filter-tag')
+        if (tag) filterByTag(tag)
+      })
+    })
+  }
+
+  document.addEventListener('astro:page-load', initTagFilter)
+  document.addEventListener('astro:after-swap', initTagFilter)
+</script>

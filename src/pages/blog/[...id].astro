@@ -1,0 +1,297 @@
+---
+import PostHead from '@/components/blog/PostHead.astro'
+import PostNavigation from '@/components/blog/PostNavigation.astro'
+import SubpostsHeader from '@/components/blog/SubpostsHeader.astro'
+import SubpostsSidebar from '@/components/blog/SubpostsSidebar.astro'
+import TOCHeader from '@/components/blog/TOCHeader.astro'
+import TOCSidebar from '@/components/blog/TOCSidebar.astro'
+import Breadcrumbs from '@/components/shared/Breadcrumbs.astro'
+import { SpinCar } from '@/components/spin/SpinCar'
+import { badgeVariants } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import Layout from '@/layouts/Layout.astro'
+import {
+  getAdjacentPosts,
+  getAllPostsAndSubposts,
+  getCombinedReadingTime,
+  getParentId,
+  getParentPost,
+  getPostReadingTime,
+  getSubpostCount,
+  getTOCSections,
+  hasSubposts,
+  isSubpost,
+} from '@/lib/data-utils'
+import { formatDate } from '@/lib/utils'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import { render } from 'astro:content'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const posts = await getAllPostsAndSubposts()
+  return posts?.map((post) => ({
+    params: { id: post.id },
+    props: post,
+  }))
+}
+
+const post = Astro.props
+const currentPostId = Astro.params.id
+const { Content, headings } = await render(post)
+const isCurrentSubpost = isSubpost(currentPostId)
+const navigation = await getAdjacentPosts(currentPostId)
+const parentPost = isCurrentSubpost ? await getParentPost(currentPostId) : null
+
+const hasChildPosts = await hasSubposts(currentPostId)
+const subpostCount = !isCurrentSubpost ? await getSubpostCount(currentPostId) : 0
+const postReadingTime = await getPostReadingTime(currentPostId)
+const combinedReadingTime =
+  hasChildPosts && !isCurrentSubpost ? await getCombinedReadingTime(currentPostId) : null
+
+const tocSections = await getTOCSections(currentPostId)
+---
+
+<Layout>
+  <PostHead slot='head' post={post} />
+
+  <!-- subposts navigation -->
+  {
+    (hasChildPosts || isCurrentSubpost) && (
+      <SubpostsHeader
+        slot='subposts-navigation'
+        parentId={isCurrentSubpost ? getParentId(currentPostId) : currentPostId}
+      />
+    )
+  }
+
+  <!-- table of contents -->
+  {
+    headings?.length > 0 &&
+      !(isCurrentSubpost && headings.length === 1 && headings[0].text === post.data.title) && (
+        <TOCHeader slot='table-of-contents' headings={headings} />
+      )
+  }
+
+  <section
+    class='grid grid-cols-[minmax(0px,1fr)_min(calc(var(--breakpoint-md)-2rem),100%)_minmax(0px,1fr)] gap-y-6'
+  >
+    <!-- jp title -->
+
+    <!-- breadcrumbs -->
+    <div class='col-start-2'>
+      <div class='mt-3 mb-6 text-center'>
+        <h2 class='text-foreground text-xl font-bold'>{'キャプチャ・ザ・フラッグ'}</h2>
+        <div class='mt-2'>
+          <Breadcrumbs
+            items={[
+              { href: '/blog', label: 'Blog', icon: 'lucide:library-big' },
+              ...(isCurrentSubpost && parentPost
+                ? [
+                    {
+                      href: `/blog/${parentPost.id}`,
+                      label: parentPost?.data?.title ?? 'Post',
+                      icon: 'lucide:book-open',
+                    },
+                    {
+                      href: `/blog/${currentPostId}`,
+                      label: post?.data?.title ?? 'Post',
+                      icon: 'lucide:file-text',
+                    },
+                  ]
+                : [
+                    {
+                      href: `/blog/${currentPostId}`,
+                      label: post?.data?.title ?? 'Post',
+                      icon: 'lucide:book-open-text',
+                    },
+                  ]),
+            ]}
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- the damn image -->
+    {
+      (() => {
+        const CTF_LOGO_DATA_URL =
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='50%25' stop-color='%231e293b'/%3E%3Cstop offset='100%25' stop-color='%230f172a'/%3E%3C/linearGradient%3E%3Cfilter id='gl'%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='1' flood-color='%23e94560' flood-opacity='0.5'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='120' height='80' rx='6' fill='url(%23g)' stroke='%23334155' stroke-width='1'/%3E%3Cpath d='M22 22 L42 40 L22 58 Z' fill='%23e94560' filter='url(%23gl)'/%3E%3Crect x='48' y='26' width='52' height='5' rx='2.5' fill='%23e94560'/%3E%3Crect x='48' y='36' width='42' height='5' rx='2.5' fill='%23f87171' opacity='0.9'/%3E%3Crect x='48' y='46' width='48' height='5' rx='2.5' fill='%23e94560' opacity='0.85'/%3E%3Ctext x='60' y='68' font-family='system-ui,sans-serif' font-size='10' font-weight='bold' fill='%23e94560'%3ECTF%3C/text%3E%3C/svg%3E"
+        const img = post.data?.image as unknown
+        if (!img) return null
+        const isCtfLogo =
+          (typeof img === 'string' && img.includes('ctf_flag_logo')) ||
+          (typeof img === 'object' && img !== null && JSON.stringify(img).includes('ctf_flag_logo'))
+        if (isCtfLogo) {
+          return (
+            <img
+              src={CTF_LOGO_DATA_URL}
+              alt={post.data?.title ?? ''}
+              class='col-span-full mx-auto w-full max-w-3xl rounded-lg object-cover'
+            />
+          )
+        }
+        if (typeof img === 'string') {
+          const src = img.startsWith('/public') ? img.slice(7) : img
+          return (
+            <img
+              src={src}
+              alt={post.data?.title ?? ''}
+              class='col-span-full mx-auto w-full max-w-3xl rounded-lg object-cover'
+            />
+          )
+        }
+        return (
+          <Image
+            src={img as import('astro').ImageMetadata}
+            alt={post.data?.title ?? ''}
+            width={1200}
+            height={630}
+            class='col-span-full mx-auto w-full max-w-3xl object-cover'
+          />
+        )
+      })()
+    }
+
+    <!-- post title and metadata -->
+    <section class='col-start-2 flex flex-col gap-y-6 text-center'>
+      <div class='flex flex-col'>
+        <h1
+          class='mb-2 scroll-mt-31 text-3xl leading-tight font-medium sm:text-4xl'
+          id='post-title'
+        >
+          {post.data?.title}
+        </h1>
+
+        <div
+          class='text-muted-foreground divide-border mb-4 flex flex-col items-center justify-center divide-y text-xs sm:flex-row sm:flex-wrap sm:divide-x sm:divide-y-0 sm:text-sm'
+        >
+          <!-- date -->
+          <div
+            class='flex w-full items-center justify-center gap-2 py-2 sm:w-fit sm:px-2 sm:py-0 first:sm:pl-0 last:sm:pr-0'
+          >
+            <span>{formatDate(post.data?.date)}</span>
+          </div>
+
+          <!-- reading time -->
+          <div
+            class='flex w-full items-center justify-center gap-2 py-2 sm:w-fit sm:px-2 sm:py-0 first:sm:pl-0 last:sm:pr-0'
+          >
+            <span>
+              {postReadingTime}
+              {
+                combinedReadingTime && combinedReadingTime !== postReadingTime && (
+                  <span class='text-muted-foreground'> ({combinedReadingTime} total)</span>
+                )
+              }
+            </span>
+          </div>
+
+          <!-- subposts count -->
+          {
+            subpostCount > 0 && (
+              <div class='flex w-full items-center justify-center gap-1 py-2 sm:w-fit sm:px-2 sm:py-0 first:sm:pl-0 last:sm:pr-0'>
+                <Icon name='lucide:file-text' class='size-3' />
+                {subpostCount} subpost{subpostCount === 1 ? '' : 's'}
+              </div>
+            )
+          }
+        </div>
+
+        <!-- tags -->
+        <div class='flex flex-wrap justify-center gap-2'>
+          {
+            post.data?.tags &&
+              post.data?.tags.length > 0 &&
+              post.data?.tags.map((tag) => (
+                <a href={`/tags/${tag}`} class={badgeVariants({ variant: 'muted' })}>
+                  <Icon name='lucide:hash' class='size-3' />
+                  {tag}
+                </a>
+              ))
+          }
+        </div>
+      </div>
+
+      <PostNavigation
+        newerPost={navigation.newer}
+        olderPost={navigation.older}
+        parentPost={isCurrentSubpost ? navigation.parent : undefined}
+      />
+    </section>
+
+    <!-- left toc -->
+    {tocSections.length > 0 && <TOCSidebar sections={tocSections} currentPostId={currentPostId} />}
+
+    <article class='prose col-start-2 max-w-none'>
+      <Content />
+    </article>
+
+    {
+      (hasChildPosts || isCurrentSubpost) && (
+        <SubpostsSidebar
+          parentId={isCurrentSubpost ? getParentId(currentPostId) : currentPostId}
+          className='w-64'
+        />
+      )
+    }
+
+    <PostNavigation
+      newerPost={navigation.newer}
+      olderPost={navigation.older}
+      parentPost={isCurrentSubpost ? navigation.parent : undefined}
+    />
+  </section>
+
+  <SpinCar client:visible />
+
+  <Button
+    variant='outline'
+    size='icon'
+    className='group fixed right-8 bottom-8 z-50 hidden'
+    id='scroll-to-top'
+    title='Scroll to top'
+    aria-label='Scroll to top'
+  >
+    <Icon
+      name='lucide:arrow-up'
+      class='mx-auto size-4 transition-all group-hover:-translate-y-0.5'
+    />
+  </Button>
+
+  <script>
+    document.addEventListener('astro:page-load', () => {
+      const scrollToTopButton = document.getElementById('scroll-to-top')
+      const footer = document.querySelector('footer')
+
+      if (scrollToTopButton && footer) {
+        scrollToTopButton.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        })
+
+        window.addEventListener('scroll', () => {
+          const footerRect = footer.getBoundingClientRect()
+          const isFooterVisible = footerRect.top <= window.innerHeight
+
+          scrollToTopButton.classList.toggle('hidden', window.scrollY <= 300 || isFooterVisible)
+        })
+      }
+    })
+  </script>
+</Layout>
+
+<script>
+  const ensureKatexStyles = () => {
+    if (!document.querySelector('.katex')) return
+    if (document.querySelector('link[href*="katex.min.css"]')) return
+
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css'
+    document.head.appendChild(link)
+  }
+
+  document.addEventListener('astro:page-load', ensureKatexStyles)
+  document.addEventListener('astro:after-swap', ensureKatexStyles)
+</script>

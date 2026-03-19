@@ -1,0 +1,19 @@
+---
+import Hero from '@/components/home/Hero.astro'
+import PageTitle from '@/components/home/PageTitle.astro'
+import ProjectsSection from '@/components/home/ProjectsSection.astro'
+import Breadcrumbs from '@/components/shared/Breadcrumbs.astro'
+import PageHead from '@/components/shared/PageHead.astro'
+import { SpinCat } from '@/components/spin/SpinCat'
+import Layout from '@/layouts/Layout.astro'
+---
+
+<Layout class='max-w-3xl'>
+  <PageHead slot='head' title='Home' />
+  <PageTitle titleJP='ホームページ。'>
+    <Breadcrumbs slot='breadcrumbs' items={[{ label: 'home', icon: 'lucide:home' }]} />
+  </PageTitle>
+  <Hero />
+  <ProjectsSection />
+  <SpinCat client:idle />
+</Layout>

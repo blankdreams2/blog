@@ -1,0 +1,51 @@
+---
+name: 'Bad Decicions Inc.'
+description: 'A real-time, mobile-first party mini-game platform for groups on the go. One host, QR code to join, 5+ games — winner picks the spot.'
+tags: ['Web', 'TypeScript', 'React', 'Next.js', 'Tailwind CSS', 'Vercel', 'Turborepo']
+link: 'https://baddecisionsinc.vercel.app/'
+startDate: '2026-02-20'
+endDate: '2026-02-21'
+image: '/public/project/bdi.gif'
+caseStudy: true
+---
+
+import Callout from '@/components/shared/Callout.astro'
+
+<Callout variant="tip" title="TL;DR">
+You would not need to download an app, no sign-ups for players. Just scan a QR code, play a mini-game, winner decides where the group goes next. It's how Vegas would solve your indecision.
+</Callout>
+
+## Overview
+
+Every friend group in Vegas asks the same questions: *Where should we eat? What should we do next?* Nobody wants to decide, everyone has an opinion, and you burn half the night arguing. Vegas is a city built on settling things with a gamble — so we thought, why not settle group decisions the same way?
+
+Instead of doom-scrolling Yelp or doing the painful "I don't care, you pick" dance, we built a platform where you literally wager your say on fast, chaotic mini-games. **Winner picks the spot.** Loser takes the punishment card. Just like Vegas: the house always deals, and somebody always walks away with a story.
+
+<img src="/project/bdi/room.png" alt="Room lobby" class="w-1/2 mx-auto rounded-lg" />
+
+## The Games
+
+One person hosts a room and everyone else joins instantly by scanning a QR code. The host picks from five Vegas-themed mini-games:
+
+- **Rebel Shake** — A 15-second phone-shaking frenzy. Like shaking dice at the craps table, but your arm does the work.
+- **Vegas Pan Flip** — Flick your phone to launch and flip an egg. High-stakes flipping, zero cleanup.
+- **Poker Chip Tap** — Spam-tap a 3D poker chip for the highest score before time runs out. Pure chaos.
+- **Kanpai Timing** — Tap in rhythm as two beer glasses clink to a beat. Precision under pressure.
+- **Chopstick Catch** — Catch falling sushi with chopsticks in a 3D scene. Dexterity challenge meets dinner prep.
+
+Every round has a synced countdown, live race-track leaderboard, and real-time scoring.
+
+<img src="/project/bdi/play.png" alt="Gameplay" class="w-1/2 mx-auto rounded-lg" />
+
+## How It Works
+
+The flow is simple: host creates a room, players scan the QR, everyone joins the same game session. No accounts, no friction. Each round runs for a fixed time — when the countdown hits zero, scores lock and the leaderboard updates. The winner earns the right to call the next move for the group. Dinner? Drinks? Another round? Their call.
+
+<img src="/project/bdi/dashboard.png" alt="Dashboard" class="w-1/2 mx-auto rounded-lg" />
+
+## Current State
+
+The platform is live and playable. We ran it during a Vegas trip in February 2026 — real groups, real indecision, real mini-games. The core loop works: create room, join via QR, play, winner decides. We're iterating on game feel, adding more punishment card variety, and polishing the mobile experience. Next up: persistence for rematches and a few more games in the rotation.
+
+## Reflection
+

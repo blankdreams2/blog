@@ -1,0 +1,30 @@
+---
+const shortcuts = [
+  { label: 'Open Quick Access', keys: ['Q'] },
+  { label: 'Close Quick Access', keys: ['Q', 'Esc'] },
+  { label: 'Toggle Dark Mode', keys: ['D'] },
+  { label: 'Toggle Focus', keys: ['F'] },
+]
+---
+
+<div class='quick-access-tips hidden md:block'>
+  <div class='border-border bg-muted/30 rounded-xl border p-3'>
+    <p class='text-muted-foreground mb-2 text-xs font-semibold'>TIP: Shortcuts</p>
+    <ul class='space-y-1.5 text-xs'>
+      {
+        shortcuts.map(({ label, keys }) => (
+          <li class='flex items-center justify-between gap-4'>
+            <span>{label}</span>
+            <span class='flex items-center gap-1'>
+              {keys.map((key) => (
+                <kbd class='border-border bg-muted inline-flex h-5 min-w-5 items-center justify-center rounded border px-1.5 font-mono text-[10px] font-medium'>
+                  {key}
+                </kbd>
+              ))}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>

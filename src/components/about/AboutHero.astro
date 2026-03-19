@@ -1,0 +1,38 @@
+---
+import { AboutScene } from '@/components/about/AboutScene'
+import LiveClock from '@/components/about/LiveClock'
+import { Image } from 'astro:assets'
+---
+
+<section
+  class='bg-grid-pattern relative mb-8 flex min-w-0 flex-col items-center gap-6 overflow-hidden p-6 pb-4 text-center'
+>
+  <LiveClock client:load />
+
+  <!-- polaroid centered, computer & tree float around -->
+  <div class='relative z-10 flex min-h-[200px] items-center justify-center sm:min-h-[260px]'>
+    <div
+      class='group relative z-10 -rotate-2 bg-white p-3 pb-12 shadow-lg transition-transform duration-300 hover:scale-105 hover:rotate-[-4deg] hover:shadow-xl'
+    >
+      <Image
+        src='/static/coffee.png'
+        alt='blank_dreams'
+        class='relative block h-auto w-44 shadow-sm sm:w-48'
+        width={200}
+        height={200}
+      />
+      <p
+        class='font-caveat absolute bottom-3 left-1/2 -translate-x-1/2 text-sm whitespace-nowrap text-neutral-800'
+      >
+        just the letter T.
+      </p>
+    </div>
+    <AboutScene client:idle />
+  </div>
+  <h1 class='font-bon-vivant pt-2 text-4xl font-bold sm:text-6xl md:text-7xl'>
+    who's <br />
+    <span class='text-accent font-display -mt-6 block min-w-0 overflow-hidden text-ellipsis text-3xl font-black sm:-mt-8 sm:text-5xl md:text-6xl'>
+      blank_dreams?
+    </span>
+  </h1>
+</section>

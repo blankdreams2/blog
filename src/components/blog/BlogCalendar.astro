@@ -1,0 +1,58 @@
+---
+import BlogCard from '@/components/blog/BlogCard.astro'
+import { groupPostsByYear } from '@/lib/data-utils'
+import { formatDateShort } from '@/lib/utils'
+import type { CollectionEntry } from 'astro:content'
+
+interface Props {
+  parentPosts: CollectionEntry<'blog'>[]
+}
+
+const { parentPosts } = Astro.props
+const postsByYear = groupPostsByYear(parentPosts)
+const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a))
+---
+
+<div class='flex min-h-[calc(100vh-18rem)] flex-col' id='blog-calendar' style='view-transition-name: blog-calendar-content'>
+  {
+    years.map((year, yearIndex) => (
+      <section class='relative flex flex-col' data-blog-year={year}>
+
+        <!-- Year header with timeline accent -->
+        <div class='mb-8 flex items-baseline gap-4'>
+          <div class='bg-primary/15 text-primary ring-primary/20 flex size-14 shrink-0 items-center justify-center rounded-2xl font-bold tabular-nums ring-1'>
+            {year}
+          </div>
+          <div class='text-muted-foreground text-sm font-medium uppercase tracking-wider'>
+            {postsByYear[year].length} post{postsByYear[year].length === 1 ? '' : 's'}
+          </div>
+          <div class='bg-border h-px flex-1' />
+        </div>
+
+        <!-- Posts with date badges -->
+        <ul class='flex flex-col gap-8'>
+          {postsByYear[year].map((post) => (
+            <li class='relative' data-blog-post data-tags={post.data.tags?.join(',') ?? ''}>
+              <div class='mb-2 flex items-center gap-2'>
+                <time
+                  datetime={post.data.date.toISOString()}
+                  class='text-muted-foreground bg-muted/60 rounded-lg px-2.5 py-1 text-xs font-medium tabular-nums'
+                >
+                  {formatDateShort(post.data.date)}
+                </time>
+              </div>
+              <BlogCard entry={post} />
+            </li>
+          ))}
+        </ul>
+
+        <!-- Divider between years -->
+        {
+          yearIndex < years.length - 1 && (
+            <div class='border-border my-16 border-t' aria-hidden />
+          )
+        }
+      </section>
+    ))
+  }
+</div>

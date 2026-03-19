@@ -1,0 +1,102 @@
+---
+import Link from '@/components/shared/Link.astro'
+import { Badge } from '@/components/ui/badge'
+import { cn, formatDate } from '@/lib/utils'
+import { Icon } from 'astro-icon/components'
+import type { CollectionEntry } from 'astro:content'
+
+interface Props {
+  project: CollectionEntry<'projects'>
+  featured?: boolean
+}
+
+const { project, featured = false } = Astro.props
+
+
+// Normalize image path
+const img = project.data.image as unknown
+let imageSrc: string | null = null
+if (img) {
+  if (typeof img === 'string') imageSrc = img.startsWith('/public') ? img.slice(7) : img
+  else if (typeof img === 'object' && img !== null && 'src' in img)
+    imageSrc = (img as { src?: string }).src ?? null
+}
+---
+
+<div
+  class={cn(
+    'hover:bg-muted/50 rounded-xl border transition-colors duration-300 ease-in-out',
+    featured ? 'p-6' : 'p-4',
+  )}
+>
+  <Link
+    href={project.data.caseStudy ? `/project/${project.id}` : project.data.link}
+    class={cn('group flex gap-4', featured ? 'flex-col' : 'flex-col sm:flex-row')}
+    external={!project.data.caseStudy}
+  >
+    <div
+      class={cn(
+        'bg-muted flex shrink-0 items-center justify-center overflow-hidden rounded-lg',
+        featured ? 'aspect-video w-full' : 'aspect-video w-full sm:w-48 sm:h-36',
+      )}
+    >
+      {
+        imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={project.data.name}
+            width={featured ? 600 : 300}
+            height={featured ? 340 : 108}
+            class='size-full object-cover'
+          />
+        ) : (
+          <span class='text-muted-foreground text-4xl'>📦</span>
+        )
+      }
+    </div>
+    <div class='min-w-0 grow'>
+      <h3 class={cn('font-medium', featured ? 'mb-2 text-xl' : 'mb-1 text-lg')}>
+        {project.data.name}
+      </h3>
+      <p
+        class={cn(
+          'text-muted-foreground leading-relaxed',
+          featured ? 'mb-3 text-base line-clamp-3' : 'mb-2 text-sm',
+        )}
+      >
+        {project.data.description}
+      </p>
+      {
+        project.data.startDate && (
+          <p class='text-muted-foreground/70 mb-2 flex items-center gap-x-1.5 text-xs'>
+            <span class='flex items-center gap-x-1.5'>
+              <Icon name='lucide:calendar' class='size-3' />
+              <span>
+                {formatDate(project.data.startDate)}
+                {project.data.endDate ? ` → ${formatDate(project.data.endDate)}` : ' → Present'}
+              </span>
+            </span>
+          </p>
+        )
+      }
+      {
+        project.data.tags && (
+          <div class='flex flex-wrap gap-2'>
+            {project.data.tags.map((tag: string) => (
+              <Badge variant='muted'>{tag}</Badge>
+            ))}
+          </div>
+        )
+      }
+      <div class='mt-2 flex items-center gap-2 text-sm'>
+        <span class='text-muted-foreground group-hover:text-accent transition-colors'>
+          {project.data.caseStudy ? 'Read case study' : 'Visit'}
+        </span>
+        <Icon
+          name={project.data.caseStudy ? 'lucide:chevron-right' : 'lucide:arrow-up-right'}
+          class='text-muted-foreground group-hover:text-accent size-3.5 transition-colors'
+        />
+      </div>
+    </div>
+  </Link>
+</div>

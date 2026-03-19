@@ -1,0 +1,106 @@
+---
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+  activeTab: 'table' | 'posts'
+}
+
+const { activeTab } = Astro.props
+---
+
+<div class='mb-8' id='blog-tabs'>
+  <div class='border-border flex gap-1 rounded-lg border p-1' role='tablist' aria-label='Blog view'>
+    <button
+      type='button'
+      role='tab'
+      aria-selected={activeTab === 'posts'}
+      aria-controls='blog-posts-panel'
+      id='blog-posts-tab'
+      data-tab='posts'
+      class='flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors'
+    >
+      <Icon name='lucide:book-copy' class='size-4' />
+      Posts
+    </button>
+    <button
+      type='button'
+      role='tab'
+      aria-selected={activeTab === 'table'}
+      aria-controls='blog-table-panel'
+      id='blog-table-tab'
+      data-tab='table'
+      class='flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors'
+    >
+      <Icon name='lucide:table' class='size-4' />
+      Writeups
+    </button>
+  </div>
+</div>
+
+<style>
+  #blog-tabs button[aria-selected='true'] {
+    background-color: var(--color-muted);
+    color: var(--color-foreground);
+  }
+  #blog-tabs button[aria-selected='false'] {
+    color: var(--color-muted-foreground);
+  }
+  #blog-tabs button[aria-selected='false']:hover {
+    color: var(--color-foreground);
+    background-color: var(--color-muted);
+  }
+</style>
+
+<script>
+  function initBlogTabs() {
+    const tabs = document.querySelectorAll<HTMLButtonElement>('#blog-tabs [role="tab"]')
+    const tablePanel = document.getElementById('blog-table-panel')
+    const postsPanel = document.getElementById('blog-posts-panel')
+
+    if (!tabs.length || !tablePanel || !postsPanel) return
+
+    const tableEl = tablePanel
+    const postsEl = postsPanel
+
+    function switchTab(selectedTab: 'table' | 'posts') {
+      tabs.forEach((tab) => {
+        const isSelected = tab.getAttribute('data-tab') === selectedTab
+        tab.setAttribute('aria-selected', String(isSelected))
+      })
+      tableEl.hidden = selectedTab !== 'table'
+      postsEl.hidden = selectedTab !== 'posts'
+
+      // Persist preference
+      try {
+        sessionStorage.setItem('blog-active-tab', selectedTab)
+      } catch (_) {}
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab')
+        if (tabId === 'table' || tabId === 'posts') {
+          switchTab(tabId)
+        }
+      })
+    })
+
+    // Restore from session or use default (posts). On mobile, default to posts.
+    const isMobile = window.matchMedia('(max-width: 768px)').matches
+    try {
+      const saved = sessionStorage.getItem('blog-active-tab')
+      if (isMobile && !saved) {
+        switchTab('posts')
+      } else if (saved === 'table') {
+        switchTab('table')
+      } else {
+        switchTab('posts')
+      }
+    } catch (_) {
+      switchTab('posts')
+    }
+  }
+
+  document.addEventListener('astro:page-load', initBlogTabs)
+  document.addEventListener('astro:after-swap', initBlogTabs)
+</script>

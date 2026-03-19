@@ -1,0 +1,118 @@
+---
+
+---
+
+<div
+  id='custom-cursor'
+  class='pointer-events-none fixed top-0 left-0 z-9999 hidden size-24 lg:block'
+  style='
+    opacity: 0;
+    background-image: url(/walking.gif);
+    background-position: 120% 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+  '
+  aria-hidden='true'
+>
+</div>
+
+<script>
+  const CURSOR_SIZE = 96
+  const FOLLOW_SPEED = 0.12
+
+  function initCustomCursor() {
+    const cursor = document.getElementById('custom-cursor')
+    if (!cursor) return
+
+    const mq = window.matchMedia('(min-width: 1024px)')
+    if (!mq.matches) return
+
+    const state = ((window as any).__customCursor = (window as any).__customCursor || {})
+
+    if (state.cleanup) state.cleanup()
+
+    let visible = false
+    let rafId = 0
+
+    let targetX = 0
+    let targetY = 0
+    let currentX = 0
+    let currentY = 0
+    let hasTarget = false
+
+    function updatePosition(x: number, y: number) {
+      if (!cursor) return
+      cursor.style.transform = `translate(${x - CURSOR_SIZE / 2}px, ${y - CURSOR_SIZE / 2}px)`
+    }
+
+    function tick() {
+      rafId = window.requestAnimationFrame(tick)
+      if (!visible || !hasTarget) return
+
+      currentX += (targetX - currentX) * FOLLOW_SPEED
+      currentY += (targetY - currentY) * FOLLOW_SPEED
+
+      updatePosition(currentX, currentY)
+    }
+
+    function show() {
+      visible = true
+      if (!cursor) return
+      cursor.style.opacity = '1'
+    }
+
+    function hide() {
+      visible = false
+      if (!cursor) return
+      cursor.style.opacity = '0'
+    }
+
+    function handleMouseMove(e: MouseEvent) {
+      targetX = e.clientX
+      targetY = e.clientY
+      if (!hasTarget) {
+        hasTarget = true
+        currentX = targetX
+        currentY = targetY
+        updatePosition(currentX, currentY)
+      }
+      show()
+    }
+
+    function handleMouseLeave() {
+      hide()
+    }
+
+    function handleMouseDown() {
+      hide()
+    }
+
+    function handleMouseUp() {
+      show()
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseleave', handleMouseLeave)
+    document.addEventListener('mousedown', handleMouseDown)
+    document.addEventListener('mouseup', handleMouseUp)
+
+    rafId = window.requestAnimationFrame(tick)
+
+    state.cleanup = () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseleave', handleMouseLeave)
+      document.removeEventListener('mousedown', handleMouseDown)
+      document.removeEventListener('mouseup', handleMouseUp)
+      if (rafId) window.cancelAnimationFrame(rafId)
+      state.cleanup = null
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCustomCursor)
+  } else {
+    initCustomCursor()
+  }
+
+  document.addEventListener('astro:after-swap', initCustomCursor)
+</script>

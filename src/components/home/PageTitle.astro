@@ -1,0 +1,18 @@
+---
+interface Props {
+  titleJP?: string
+  subTitle?: string
+}
+
+const { titleJP, subTitle } = Astro.props
+---
+
+<div class='mt-3 mb-6 text-center'>
+  <h2 class='text-foreground text-xl font-bold'>
+    {titleJP ?? ''}
+  </h2>
+  {subTitle && <p class='text-muted-foreground mt-1 font-sans'>{subTitle}</p>}
+  <div class='mt-2'>
+    <slot name='breadcrumbs' />
+  </div>
+</div>

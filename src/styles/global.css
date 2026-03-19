@@ -1,0 +1,513 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme inline {
+  --font-sans:
+    'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-mono:
+    Geist Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+  --font-display: 'Mudstone Sans', sans-serif;
+  --font-editorial: 'PP Editorial New', serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-caveat: 'Caveat', cursive;
+  --font-bonvivant: 'BonVivant', cursive;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/GeistVF.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMonoVF.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inclusive Sans';
+  src: url('/fonts/InclusiveSans-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inclusive Sans';
+  src: url('/fonts/InclusiveSans-Italic-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* display + decorative */
+
+@font-face {
+  font-family: 'Mudstone Sans';
+  src: url('/fonts/MudstoneSans.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/BricolageGrotesque.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caveat';
+  src: url('/fonts/Caveat.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BonVivant';
+  src: url('/fonts/BonVivant.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* pp editorial new family */
+
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorial/PPEditorialNew-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorial/PPEditorialNew-Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorial/PPEditorialNew-Ultralight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorial/PPEditorialNew-UltralightItalic.otf') format('opentype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorial/PPEditorialNew-Ultrabold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorial/PPEditorialNew-UltraboldItalic.otf') format('opentype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* playfair display family */
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay/PlayfairDisplay-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay/PlayfairDisplay-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay/PlayfairDisplay-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay/PlayfairDisplay-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay/PlayfairDisplay-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay/PlayfairDisplay-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* :root {
+  --background: #000000;
+  --foreground: #f5f5f5;
+  --primary: #f5f5f5;
+  --primary-foreground: #000000;
+  --accent: #facc15;
+  --accent-foreground: #000000;
+  --muted: #1a1a1a;
+  --muted-foreground: #a3a3a3;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: rgba(255 255 255 / 0.1);
+  --ring: #facc15;
+}
+
+[data-theme='dark'] {
+  --background: #000000;
+  --foreground: #f5f5f5;
+  --primary: #f5f5f5;
+  --primary-foreground: #000000;
+  --accent: #facc15;
+  --accent-foreground: #000000;
+  --muted: #1a1a1a;
+  --muted-foreground: #a3a3a3;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: rgba(255 255 255 / 0.1);
+  --ring: #facc15;
+} */
+
+:root {
+  --background: oklch(0.995 0.006 95);
+  --foreground: oklch(0.22 0.02 95);
+  --primary: oklch(0.28 0.03 85);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.015 90);
+  --secondary-foreground: oklch(0.25 0 0);
+  --muted: oklch(0.94 0.01 90);
+  --muted-foreground: oklch(0.42 0.03 90);
+  --accent: oklch(0.62 0.22 350);
+  --accent-foreground: oklch(0.98 0 0);
+  --highlight: oklch(from var(--accent) calc(l + 0.16) c h);
+  --destructive: oklch(0.58 0.24 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.92 0.015 90);
+  --ring: oklch(0.62 0.22 350);
+  --bright-yellow: #facc15;
+  --contribution-empty: oklch(0.88 0.02 90);
+  --contribution-1: oklch(0.65 0.2 350);
+  --contribution-2: oklch(0.58 0.22 350);
+  --contribution-3: oklch(0.52 0.22 350);
+  --contribution-4: oklch(0.46 0.2 350);
+}
+
+[data-theme='dark'] {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(26.9% 0 0);
+  --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.55 0.11 258);
+  --accent-foreground: oklch(0.98 0 0);
+  --highlight: oklch(from var(--accent) calc(l + 0.08) c h);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --ring: oklch(0.556 0 0);
+  --bright-yellow: #FACC15;
+  --contribution-empty: oklch(0.35 0.02 250);
+  --contribution-1: oklch(0.82 0.14 258);
+  --contribution-2: oklch(0.72 0.13 258);
+  --contribution-3: oklch(0.62 0.12 258);
+  --contribution-4: oklch(0.52 0.12 258);
+}
+
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    @apply border-border outline-ring/50 tracking-tight;
+  }
+}
+
+/* Light theme selection */
+::selection {
+  @apply bg-gray-500 text-white;
+}
+
+/* Dark theme selection */
+.dark ::selection {
+  @apply bg-gray-300 text-black;
+}
+
+/* tooltip fade */
+@keyframes tooltip-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tooltip-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.tooltip-fade {
+  animation: tooltip-fade-in 0.2s ease-out forwards;
+}
+
+.tooltip-fade[data-state='closed'] {
+  animation: tooltip-fade-out 0.15s ease-in forwards;
+}
+
+
+/* background grid small squares */
+@layer utilities {
+  .bg-grid-pattern {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .bg-grid-pattern::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      linear-gradient(to right, oklch(0.95 0 0) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.95 0 0) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: 0 0;
+    animation: grid-move 2s linear infinite;
+    will-change: background-position;
+    mask-image: radial-gradient(ellipse at center,
+        black 0%,
+        black 30%,
+        transparent 70%,
+        transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse at center,
+        black 0%,
+        black 30%,
+        transparent 70%,
+        transparent 100%);
+    pointer-events: none;
+    mix-blend-mode: normal;
+  }
+
+  @keyframes grid-move {
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: 24px 0;
+    }
+  }
+
+  @-webkit-keyframes grid-move {
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: 24px 0;
+    }
+  }
+
+  .bg-grid-pattern>* {
+    position: relative;
+    z-index: 1;
+  }
+
+  [data-theme='dark'] .bg-grid-pattern::before {
+    background-image:
+      linear-gradient(to right, oklch(1 0 0 / 0.15) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(1 0 0 / 0.15) 1px, transparent 1px);
+  }
+}
+
+/* Focus mode: dim header/footer to reduce distractions */
+html.focus-mode header,
+html.focus-mode footer {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+html.focus-mode header:hover,
+html.focus-mode footer:hover {
+  opacity: 1;
+}
+
+/* Quick Access */
+.quick-access {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+body[data-quick-access='open'] .quick-access {
+  pointer-events: auto;
+}
+
+.quick-access-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: color-mix(in oklch, var(--background) 50%, transparent);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+body[data-quick-access='open'] .quick-access-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.quick-access-close {
+  position: fixed;
+  top: 2rem;
+  right: 1rem;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  background: color-mix(in oklch, var(--muted) 50%, transparent);
+  color: var(--foreground);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+body[data-quick-access='open'] .quick-access-close {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.quick-access-close:hover {
+  background: color-mix(in oklch, var(--muted) 70%, transparent);
+}
+
+.quick-access-panel {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  top: 5rem;
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+  border-radius: 1rem 1rem 0 0;
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--background) 98%, transparent);
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+  box-shadow: 0 -4px 20px oklch(0 0 0 / 0.1);
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .quick-access-panel {
+    left: auto;
+    right: 1.5rem;
+    top: 5.5rem;
+    bottom: 2rem;
+    width: 368px;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px oklch(0 0 0 / 0.1);
+  }
+}
+
+body[data-quick-access='open'] .quick-access-panel {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.quick-access-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.quick-access-tips {
+  padding-top: 1rem;
+}
+
+/* Custom cursor: keep native cursor; walking gif trails behind */

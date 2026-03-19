@@ -1,0 +1,59 @@
+---
+import Contributions from '@/components/about/contributions/Contributions'
+import Paragraph from '@/components/about/Paragraph.tsx'
+import { REPO_URL } from '@/consts'
+import { getGithubData } from '@/lib/github'
+
+const githubData = await getGithubData()
+---
+
+<section class='flex flex-col gap-8 px-2'>
+  <Paragraph client:load tag='chào, or hi there' dir='ltr'>
+    The name is <span class='font-semibold text-white'>T</span> and I'm a grad student at
+    <span class='font-semibold text-[#c10e2f]'>UNLV</span>, with a record of being a <span
+      class='font-semibold text-[#facc15]'>2x hackathon</span
+    > winner, and a <span class='font-semibold text-[#facc15]'>10x CTF</span> winner. I've been doing
+    this coding thing for a bit now and the result kind of show how much I have been enjoying it. Right
+    now I'm really into
+    <span class='text-accent font-semibold'>Cybersecurity</span> and <span
+      class='text-accent font-semibold'>RPG Maker Games</span
+    >.
+    <!-- {` — I'm also broke (classic :D).`} -->
+  </Paragraph>
+
+  <!--  -->
+  <Paragraph client:load tag='currently?' dir='rtl'>
+    {`Limbus Company.`}
+    <Contributions client:load githubData={githubData} />
+  </Paragraph>
+
+  <!--  -->
+  <!-- <Paragraph client:load tag='outside of school' dir='ltr'>
+    {`I'm also fascinated with `}
+    <span class='text-highlight font-semibold'>mathematics</span>
+    {` and wish to make a career out of it someday. Things I love include: `}
+    <span class='font-semibold text-[#eb8033] dark:text-[#C4A484]'>coffee</span>
+    {`, dark mode, and cats.`}
+  </Paragraph> -->
+
+  <!--  -->
+  <!-- <Paragraph client:load tag='rpg maker games' dir='rtl'>
+    {
+      `Words can't describe how big of a fan I am of this subculture, which had its heyday in the early 2010s. I'm still actively playing these games and, hopefully, one day, `
+    }
+    <span class='text-accent font-semibold'>I will create one myself</span>
+    {`. Some of my personal favorites is in the dashboard.`}
+  </Paragraph> -->
+
+  <!-- <Paragraph client:load tag='Source Code' dir='ltr'>
+    {`I hope you enjoy my website. The source code for this site is available on `}
+    <a
+      href={REPO_URL}
+      target='_blank'
+      rel='noopener noreferrer'
+      class='text-accent decoration-accent font-semibold underline underline-offset-2 hover:opacity-80'
+    >
+      @blankdreams2/web
+    </a>
+  </Paragraph> -->
+</section>

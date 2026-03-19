@@ -1,0 +1,24 @@
+---
+import AboutHero from '@/components/about/AboutHero.astro'
+import AboutPageTitle from '@/components/about/AboutPageTitle'
+import AboutSections from '@/components/about/AboutSections.astro'
+import { SpinMonika } from '@/components/spin/SpinMonika'
+import LiveClock from '@/components/about/LiveClock'
+import Breadcrumbs from '@/components/shared/Breadcrumbs.astro'
+import { ExperienceTimeline } from '@/components/home/ExperienceTimeline'
+import PageHead from '@/components/shared/PageHead.astro'
+import { EXPERIENCES } from '@/data/experiences'
+import Layout from '@/layouts/Layout.astro'
+---
+
+<Layout class='max-w-3xl'>
+  <PageHead slot='head' title='About' />
+  <AboutPageTitle client:load>
+    <Breadcrumbs items={[{ label: 'About', icon: 'lucide:info' }]} />
+  </AboutPageTitle>
+  <LiveClock client:load />
+  <!-- <AboutHero /> -->
+  <AboutSections />
+  <ExperienceTimeline client:load experiences={EXPERIENCES} />
+  <SpinMonika client:idle />
+</Layout>

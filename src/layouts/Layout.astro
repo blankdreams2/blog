@@ -1,0 +1,98 @@
+---
+import '@/styles/equalizer.css'
+import '@/styles/global.css'
+import '@/styles/typography.css'
+
+import Footer from '@/components/shared/Footer.astro'
+import Head from '@/components/shared/Head.astro'
+import Header from '@/components/shared/Header.astro'
+import { LoaderWrapper } from '@/components/loader/LoaderWrapper'
+import QuickAccess from '@/components/quick-access/QuickAccess.astro'
+import CustomCursor from '@/components/ui/CustomCursor.astro'
+import { SITE } from '@/consts'
+import { cn } from '@/lib/utils'
+
+interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+
+---
+
+<!doctype html>
+<html class='bg-background text-foreground scheme-light-dark' lang={SITE.locale}>
+
+  <!--  -->
+  <script is:inline>
+    ;(() => {
+      const theme = (() => {
+        try {
+          const stored = localStorage.getItem('theme') ?? ''
+          if (['dark', 'light'].includes(stored)) return stored
+        } catch (_) {}
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      })()
+      document.documentElement.setAttribute('data-theme', theme)
+    })()
+  </script>
+  <!--  -->
+  <script is:inline>
+    ;(() => {
+      const enabled = (() => {
+        try {
+          const stored = localStorage.getItem('sound') ?? ''
+          if (stored === 'off') return false
+          if (stored === 'on') return true
+        } catch (_) {}
+        return true
+      })()
+      document.documentElement.classList.toggle('sound-off', !enabled)
+    })()
+  </script>
+
+  <Head>
+    <slot name='head' />
+  </Head>
+
+  <!--  -->
+  <body class='flex h-fit min-h-screen flex-col gap-y-4 font-sans'>
+    <!-- TODO: turn on after development  -->
+    <CustomCursor />
+
+    <LoaderWrapper
+      client:load
+      showOnLanding={Astro.url.pathname === '/' || Astro.url.pathname === ''}
+    >
+      <header class='bg-background/50 sticky top-0 z-50 divide-y backdrop-blur-sm xl:divide-none'>
+        <Header />
+        <slot name='subposts-navigation' />
+        <slot name='table-of-contents' />
+      </header>
+      <main class={cn('w-full mx-auto flex grow flex-col px-4', className)}>
+        <slot />
+      </main>
+      <Footer />
+    </LoaderWrapper>
+
+    <!--  -->
+    <QuickAccess />
+
+    <!-- added this listener so the theme persists when the page is reloaded -->
+    <script is:inline>
+      document.addEventListener('astro:after-swap', () => {
+        const theme = (() => {
+          try {
+            const stored = localStorage.getItem('theme') ?? ''
+            if (['dark', 'light'].includes(stored)) return stored
+          } catch (_) {}
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        })()
+        document.documentElement.setAttribute('data-theme', theme)
+
+        const sound = localStorage.getItem('sound') || 'on'
+        document.documentElement.classList.toggle('sound-off', sound === 'off')
+      })
+    </script>
+  </body>
+</html>

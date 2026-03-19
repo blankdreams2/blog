@@ -1,0 +1,57 @@
+---
+import BlogCard from '@/components/blog/BlogCard.astro'
+import BlogTitle from '@/components/blog/BlogTitle.astro'
+import PageHead from '@/components/shared/PageHead.astro'
+import Layout from '@/layouts/Layout.astro'
+import { getAllTags, getPostsByTag } from '@/lib/data-utils'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const tagMap = await getAllTags()
+  const uniqueTags = Array.from(tagMap.keys())
+
+  return Promise.all(
+    uniqueTags.map(async (tag) => {
+      const posts = await getPostsByTag(tag)
+      return {
+        params: { id: tag },
+        props: {
+          tag,
+          posts,
+        },
+      }
+    }),
+  )
+}
+
+const { tag, posts } = Astro.props
+---
+
+<Layout class='max-w-3xl'>
+  <PageHead
+    slot='head'
+    title={`Posts tagged with "${tag}"`}
+    description={`A collection of posts tagged with ${tag}.`}
+    noindex
+  />
+
+  <BlogTitle
+    title={`#${tag}`}
+    breadcrumbItems={[
+      { href: '/tags', label: 'Tags', icon: 'lucide:tags' },
+      { label: tag, icon: 'lucide:tag' },
+    ]}
+  />
+
+  <!-- this gonna be a bigass calendar -->
+  <ul class='flex flex-col gap-y-4'>
+    {
+      posts?.map((post) => (
+        <li>
+          <BlogCard entry={post} />
+        </li>
+      ))
+    }
+  </ul>
+</Layout>

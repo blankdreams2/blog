@@ -1,0 +1,27 @@
+---
+import Breadcrumbs from '@/components/shared/Breadcrumbs.astro'
+import Link from '@/components/shared/Link.astro'
+import PageHead from '@/components/shared/PageHead.astro'
+import { buttonVariants } from '@/components/ui/button'
+import Layout from '@/layouts/Layout.astro'
+import { cn } from '@/lib/utils'
+---
+
+<Layout class='max-w-3xl'>
+  <PageHead slot='head' title='404' />
+  <div class='mt-3 mb-6 text-center'>
+    <h2 class='text-foreground text-xl font-bold'>404: Page not found</h2>
+    <div class='mt-2'>
+      <Breadcrumbs items={[{ label: '???', icon: 'lucide:circle-help' }]} />
+    </div>
+  </div>
+
+  <section class='flex flex-col items-center justify-center gap-y-4 text-center'>
+    <div class='max-w-md'>
+      <p class='prose mb-4'>Oops! The page you're looking for doesn't exist.</p>
+    </div>
+    <Link href='/' class={cn(buttonVariants({ variant: 'outline' }), 'flex gap-x-1.5 group')}>
+      <span class='transition-transform group-hover:-translate-x-1'>&larr;</span> Go to home page
+    </Link>
+  </section>
+</Layout>

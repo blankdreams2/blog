@@ -1,0 +1,17 @@
+---
+import Breadcrumbs from '@/components/shared/Breadcrumbs.astro'
+import PageTitle from '@/components/home/PageTitle.astro'
+import PageHead from '@/components/shared/PageHead.astro'
+import ProjectSection from '@/components/project/ProjectSection.astro'
+import { SpinBanhmy } from '@/components/spin/SpinBanhmy'
+import Layout from '@/layouts/Layout.astro'
+---
+
+<Layout class='max-w-5xl'>
+  <PageHead slot='head' title='Projects' />
+  <PageTitle titleJP='注目プロジェクト。'>
+    <Breadcrumbs slot='breadcrumbs' items={[{ label: 'projects', icon: 'lucide:sparkle' }]} />
+  </PageTitle>
+  <ProjectSection />
+  <SpinBanhmy client:idle />
+</Layout>

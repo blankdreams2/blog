@@ -1,0 +1,44 @@
+---
+import BlogCalendar from '@/components/blog/BlogCalendar.astro'
+import BlogTable from '@/components/blog/BlogTable.astro'
+import BlogTabs from '@/components/blog/BlogTabs.astro'
+import BlogTagFilter from '@/components/blog/BlogTagFilter.astro'
+import BlogTitle from '@/components/blog/BlogTitle.astro'
+import PageHead from '@/components/shared/PageHead.astro'
+import { SpinCar } from '@/components/spin/SpinCar'
+import { CTF_TABLE } from '@/data/ctf-table'
+import Layout from '@/layouts/Layout.astro'
+import { getAllPostsAndSubposts, isSubpost } from '@/lib/data-utils'
+
+const allPosts = await getAllPostsAndSubposts()
+const parentPosts = allPosts.filter((p) => !isSubpost(p.id))
+---
+
+<Layout class='max-w-3xl'>
+  <PageHead slot='head' title='Blog' />
+
+  <BlogTitle
+    title='ズラじゃない！桂だ！'
+    breadcrumbItems={[
+      { href: '/blog', label: 'Blog', icon: 'lucide:library-big' },
+      { label: 'All', icon: 'lucide:book-copy' },
+    ]}
+  />
+
+  <BlogTabs activeTab='posts' />
+
+  <!-- tab 1 -->
+  <div id='blog-posts-panel' role='tabpanel' aria-labelledby='blog-posts-tab'>
+    <BlogTagFilter posts={parentPosts} />
+    <BlogCalendar parentPosts={parentPosts} />
+  </div>
+
+  <!-- tab 2 -->
+  <div id='blog-table-panel' role='tabpanel' aria-labelledby='blog-table-tab' hidden>
+    <div class='flex min-h-[calc(100vh-18rem)] flex-col'>
+      <BlogTable entries={CTF_TABLE} />
+    </div>
+  </div>
+
+  <SpinCar client:idle />
+</Layout>

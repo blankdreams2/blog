@@ -1,0 +1,125 @@
+---
+interface Props {
+  messages: { id: string; message: string; created_at: string; name?: string | null; email?: string | null }[]
+  error?: string | null
+  supabaseUrl: string
+  supabaseKey: string
+}
+
+const { messages, error, supabaseUrl, supabaseKey } = Astro.props
+---
+
+<div class='flex flex-col gap-6'>
+  <!--  -->
+  <form id='guestbook-form' class='flex flex-col gap-3'>
+    <div class='flex flex-col gap-2 sm:flex-row sm:gap-2'>
+      <input
+        type='text'
+        name='name'
+        placeholder='Name (optional)'
+        maxlength='100'
+        class='border-border bg-background placeholder:text-muted-foreground focus:border-ring focus:ring-ring/20 flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:ring-2'
+      />
+      <input
+        type='email'
+        name='email'
+        placeholder='Email (optional)'
+        maxlength='255'
+        class='border-border bg-background placeholder:text-muted-foreground focus:border-ring focus:ring-ring/20 flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:ring-2'
+      />
+    </div>
+    <div class='flex gap-2'>
+      <input
+        type='text'
+        name='message'
+        placeholder='Leave a message...'
+        maxlength='500'
+        required
+        class='border-border bg-background placeholder:text-muted-foreground focus:border-ring focus:ring-ring/20 min-h-14 flex-1 rounded-md border px-3 py-3 text-sm outline-none focus:ring-2'
+      />
+      <button
+        type='submit'
+        id='guestbook-submit'
+        class='bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-9 shrink-0 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors disabled:opacity-50'
+      >
+        Post
+      </button>
+    </div>
+  </form>
+
+  <!--  -->
+  <script define:vars={{ supabaseUrl, supabaseKey }}>
+    const form = document.querySelector('#guestbook-form')
+    const submitBtn = document.querySelector('#guestbook-submit')
+    if (form && submitBtn) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        submitBtn.disabled = true
+        submitBtn.textContent = 'Posting...'
+        try {
+          const fd = new FormData(form)
+          const message = fd.get('message')?.toString()?.trim().slice(0, 500)
+          const name = fd.get('name')?.toString()?.trim().slice(0, 100) || null
+          const email = fd.get('email')?.toString()?.trim().slice(0, 255) || null
+          if (!message) {
+            window.location.href = '/guestbook?error=' + encodeURIComponent('Message required')
+            return
+          }
+          const res = await fetch(`${supabaseUrl}/rest/v1/guestbook`, {
+            method: 'POST',
+            headers: {
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json',
+              Prefer: 'return=minimal',
+            },
+            body: JSON.stringify({ message, name, email }),
+          })
+          if (res.ok) {
+            window.location.reload()
+          } else {
+            const err = await res.json().catch(() => ({}))
+            window.location.href =
+              '/guestbook?error=' + encodeURIComponent(err.message ?? 'Something went wrong')
+          }
+        } catch {
+          window.location.href = '/guestbook?error=' + encodeURIComponent('Network error')
+        } finally {
+          submitBtn.disabled = false
+          submitBtn.textContent = 'Post'
+        }
+      })
+    }
+  </script>
+
+  <!-- DEBUG: Error -->
+  {error && <p class='text-destructive text-sm'>{decodeURIComponent(error)}</p>}
+
+
+  {
+    !messages?.length ? (
+      <p class='text-muted-foreground text-sm'>No messages yet. Be the first!</p>
+    ) : (
+      <ul class='flex flex-col gap-3'>
+        {messages.map((msg) => (
+          <li class='border-border bg-muted/30 rounded-lg border px-4 py-3 text-sm'>
+            {(msg.name || msg.email) && (
+              <p class='font-display text-accent mb-1 text-xs font-medium'>
+                {msg.name}
+                {msg.name && msg.email && ' · '}
+                {/* {msg.email} */}
+              </p>
+            )}
+            <p class='text-foreground'>{msg.message}</p>
+            <time class='text-muted-foreground mt-1 block text-right text-xs' datetime={msg.created_at}>
+              {new Date(msg.created_at).toLocaleString(undefined, {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              })}
+            </time>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</div>

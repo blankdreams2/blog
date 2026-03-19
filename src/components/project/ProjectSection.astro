@@ -1,0 +1,12 @@
+---
+import { BentoProjectGrid } from './BentoProjectGrid'
+import { getAllProjects } from '@/lib/data-utils'
+import { serializeProject } from '@/lib/project-utils'
+
+const allProjects = await getAllProjects()
+const serializedProjects = allProjects.map(serializeProject)
+---
+
+<section class="flex flex-col">
+  <BentoProjectGrid projects={serializedProjects} client:load />
+</section>

@@ -1,0 +1,143 @@
+---
+import ActionCenter from './ActionCenter.astro'
+import Activity from './Activity.astro'
+import QuickAccessNav from './QuickAccessNav.astro'
+import TipShortcuts from './TipShortcuts.astro'
+---
+
+<div id='quick-access' class='quick-access' data-astro-transition-persist='quick-access'>
+  <!-- Overlay -->
+  <div id='quick-access-overlay' class='quick-access-overlay' aria-hidden='true'></div>
+
+  <!-- Close button -->
+  <button
+    type='button'
+    id='quick-access-close'
+    class='quick-access-close'
+    aria-label='Close Quick Access'
+    title='Close Quick Access'
+  >
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      width='20'
+      height='20'
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      stroke-width='2'
+      stroke-linecap='round'
+      stroke-linejoin='round'
+    >
+      <path d='M18 6 6 18M6 6l12 12'></path>
+    </svg>
+  </button>
+
+  <!-- Panel -->
+  <div id='quick-access-panel' class='quick-access-panel'>
+    <div class='quick-access-content'>
+      <ActionCenter />
+      <QuickAccessNav />
+      <Activity />
+      <TipShortcuts />
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  ;(function () {
+    const qa = (window.__quickAccess = window.__quickAccess || {})
+    let clickHandler = qa.clickHandler || null
+    let keyHandler = qa.keyHandler || null
+    let swapHandler = qa.swapHandler || null
+
+    function init() {
+      const body = document.body
+      const overlay = document.getElementById('quick-access-overlay')
+      const closeBtn = document.getElementById('quick-access-close')
+
+      function open() {
+        body.setAttribute('data-quick-access', 'open')
+        overlay?.setAttribute('aria-hidden', 'false')
+      }
+
+      function close() {
+        body.removeAttribute('data-quick-access')
+        overlay?.setAttribute('aria-hidden', 'true')
+      }
+
+      function toggle() {
+        if (body.getAttribute('data-quick-access') === 'open') close()
+        else open()
+      }
+
+      if (clickHandler) document.removeEventListener('click', clickHandler, true)
+      clickHandler = function (e) {
+        const target = e.target?.closest?.('[data-quick-access-toggle]')
+        if (target) {
+          e.preventDefault()
+          e.stopPropagation()
+          open()
+          return
+        }
+        if (e.target === closeBtn || e.target?.closest?.('#quick-access-close')) {
+          close()
+          return
+        }
+        if (e.target === overlay) close()
+        if (e.target?.closest?.('.quick-access-link')) close()
+      }
+      document.addEventListener('click', clickHandler, true)
+      qa.clickHandler = clickHandler
+
+      if (keyHandler) document.removeEventListener('keydown', keyHandler)
+      keyHandler = function (e) {
+        const isInput = ['INPUT', 'TEXTAREA'].includes(e.target?.tagName)
+        if (e.key === 'q' || e.key === 'Q') {
+          if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+            e.preventDefault()
+            toggle()
+          }
+        }
+        if (e.key === 'Escape') close()
+        if ((e.key === 'd' || e.key === 'D') && !isInput) {
+          if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+            const el = document.documentElement
+            const next = el.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+            el.setAttribute('data-theme', next)
+            localStorage.setItem('theme', next)
+          }
+        }
+        if ((e.key === 'f' || e.key === 'F') && !isInput) {
+          if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+            e.preventDefault()
+            document.documentElement.classList.toggle('focus-mode')
+            window.dispatchEvent(new CustomEvent('focus-mode-change'))
+          }
+        }
+      }
+      document.addEventListener('keydown', keyHandler)
+      qa.keyHandler = keyHandler
+    }
+
+    function onClose() {
+      const body = document.body
+      const overlay = document.getElementById('quick-access-overlay')
+      body.removeAttribute('data-quick-access')
+      overlay?.setAttribute('aria-hidden', 'true')
+    }
+
+    if (swapHandler) {
+      document.removeEventListener('astro:page-load', onClose)
+      document.removeEventListener('astro:after-swap', swapHandler)
+    }
+    swapHandler = function () {
+      onClose()
+      init()
+    }
+    qa.swapHandler = swapHandler
+    document.addEventListener('astro:page-load', onClose)
+    document.addEventListener('astro:after-swap', swapHandler)
+
+    init()
+  })()
+</script>
