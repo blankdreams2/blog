@@ -4,7 +4,7 @@
 
 [vankythien.dev](https://vankythien.dev/) — My personal blog. Built using ["astro-erudite"](https://github.com/jktrn/astro-erudite).
 
-[![CodeFactor](https://www.codefactor.io/repository/github/blankdreams2/web/badge)](https://www.codefactor.io/repository/github/blankdreams2/web)
+[![CodeFactor](https://www.codefactor.io/repository/github/blankdreams2/blog/badge)](https://www.codefactor.io/repository/github/blankdreams2/blog)
 
 </div>
 
